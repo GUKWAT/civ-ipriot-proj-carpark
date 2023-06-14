@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import random
 import mqtt_device
 import paho.mqtt.client as paho
 from paho.mqtt.client import MQTTMessage
@@ -25,10 +26,11 @@ class CarPark(mqtt_device.MqttDevice):
     @property
     def temperature(self):
         self._temperature
+
     
     @temperature.setter
     def temperature(self, value):
-        self._temperature = value
+        self._temperature = random.choice(range(10, 40))
         
     def _publish_event(self):
         readable_time = datetime.now().strftime('%H:%M')
@@ -36,13 +38,13 @@ class CarPark(mqtt_device.MqttDevice):
             (
                 f"TIME: {readable_time}, "
                 + f"SPACES: {self.available_spaces}, "
-                + "TEMPC: 42"
+                + f"TEMPC:{self.temperature}"
             )
         )
         message = (
             f"TIME: {readable_time}, "
             + f"SPACES: {self.available_spaces}, "
-            + "TEMPC: 42"
+            + f"TEMPC:{self.temperature}"
         )
         self.client.publish('display', message)
 
@@ -59,7 +61,8 @@ class CarPark(mqtt_device.MqttDevice):
     def on_message(self, client, userdata, msg: MQTTMessage):
         payload = msg.payload.decode()
         # TODO: Extract temperature from payload
-        # self.temperature = ... # Extracted value
+
+        self.temperature = payload
         if 'exit' in payload:
             self.on_car_exit()
         else:
