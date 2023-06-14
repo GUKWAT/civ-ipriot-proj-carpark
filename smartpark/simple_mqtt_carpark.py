@@ -25,7 +25,7 @@ class CarPark(mqtt_device.MqttDevice):
 
     @property
     def temperature(self):
-        self._temperature
+        return self._temperature
 
     
     @temperature.setter
